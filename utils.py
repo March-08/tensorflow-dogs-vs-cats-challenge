@@ -93,16 +93,38 @@ def get_avg_size(path_to_training):
     return (width//n,height//n)
    
 
+def test_generator(batch_size , path_to_test):
 
-def create_generators(batch_size, path_to_training, path_to_test):
+    testing_preprocessor = ImageDataGenerator(
+        rescale = 1/255.
+       )
 
+    test_generator = testing_preprocessor.flow_from_directory(
+        path_to_test,
+        class_mode="binary",
+        target_size= avg_size,
+        color_mode="rgb",
+        shuffle=False,
+        batch_size=batch_size
+        )
+
+    return test_generator
+
+
+def train_val_generators(batch_size, path_to_training):
+     
     path_to_train = os.path.join(path_to_training, "train")
     path_to_val = os.path.join(path_to_training, "val")
 
     training_preprocessor = ImageDataGenerator(
-        rescale=1/255.,
-        rotation_range=10,
-        width_shift_range=0.1
+        rescale=1./255,
+        rotation_range=40,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True,
+        fill_mode='nearest'
         )
 
     validation_preprocessor = ImageDataGenerator(
@@ -129,16 +151,7 @@ def create_generators(batch_size, path_to_training, path_to_test):
     )
 
 
-    test_generator = validation_preprocessor.flow_from_directory(
-        path_to_test,
-        class_mode="binary",
-        target_size= avg_size,
-        color_mode="rgb",
-        shuffle=False,
-        batch_size=batch_size
-    )
-
-    return train_generator, val_generator,test_generator
+    return train_generator, val_generator
 
 
 if __name__ == "__main__":
